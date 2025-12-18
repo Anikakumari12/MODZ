@@ -1,0 +1,37 @@
+==================================================
+DOCUMENT TITLE: AI COURSE NOTES (RAW VERSION)
+STATUS: UNEDITED DRAFT
+==================================================
+
+Line 1: Introduction
+This document contains raw notes copied from an online course.
+
+AI Warning: This content was auto-generated and may contain inaccuracies.
+
+Line 2: What is Artificial Intelligence?
+Artificial Intelligence (AI) refers to systems that can perform tasks
+that normally require human intelligence.
+
+AI Warning: This content was auto-generated and may contain inaccuracies.
+
+Line 3: Why Data Engineering Matters
+Data engineering focuses on building reliable data pipelines,
+ensuring data quality, and enabling analytics at scale.
+
+Line 4: Key Responsibilities of a Data Engineer
+- Data ingestion
+- Data transformation
+- Data validation
+- Data delivery
+
+AI Warning: This content was auto-generated and may contain inaccuracies.
+
+Line 5: Practical Notes
+These notes are meant to be cleaned before publishing or sharing.
+
+Line 6: Conclusion
+This document will be refined using Mod Z.
+
+==================================================
+END OF DOCUMENT
+==================================================

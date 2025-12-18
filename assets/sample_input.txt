@@ -1,0 +1,68 @@
+# ======================================================
+# MOD Z — SAMPLE INPUT FILE
+# Purpose: Demonstrate text editing at scale
+# This file is intentionally long and diverse.
+# ======================================================
+
+Document Title: Building Reliable Tools
+
+Author: Anika Kumari
+Role: Engineer in Training
+Location: Bangalore, India
+
+------------------------------------------------------
+
+Section 1: Introduction
+
+Writing and editing text manually is time-consuming.
+Many professionals delete, replace, and rearrange text every day.
+This document exists to test automated text operations.
+
+AI Warning: This section was auto-generated.
+AI Warning: This section was auto-generated.
+
+------------------------------------------------------
+
+Section 2: Daily Tasks
+
+1. Review documentation
+2. Clean repeated content
+3. Remove unnecessary warnings
+4. Preview changes safely
+5. Apply changes confidently
+
+AI Warning: This section was auto-generated.
+
+------------------------------------------------------
+
+Section 3: Notes
+
+NOTE: Always preview before committing changes.
+NOTE: Line numbers matter in command-line tools.
+NOTE: Small tools save large amounts of time.
+
+------------------------------------------------------
+
+Section 4: Example Answers
+
+Question 1: What is Mod Z?
+Answer: Mod Z is a command-line text manipulation tool.
+
+Question 2: Why preview matters?
+Answer: Preview protects original data.
+
+Question 3: Who benefits from Mod Z?
+Answer: Writers, engineers, analysts, and students.
+
+------------------------------------------------------
+
+Section 5: Extra Content for Testing
+
+This line exists to test delete_line.
+This line exists to test delete_range.
+This line exists to test replace_text.
+This line exists to test preview mode.
+
+------------------------------------------------------
+
+End of File
