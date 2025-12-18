@@ -2,12 +2,12 @@
 """
 MODZ Engine
 -----------
-A command-based text manipulation tool.
+A safe command-line text manipulation tool.
 
-Core rules:
-- Input file is never modified
-- Functions only transform data
-- main() controls preview vs save
+Design rules:
+1. Input file is NEVER modified
+2. Functions ONLY transform data
+3. main() decides preview vs write
 """
 
 import sys
@@ -16,19 +16,16 @@ import sys
 # ======================================================
 # SAFE FILE READER
 # ======================================================
-# Reads the input file safely and returns lines.
-# Any file-related error exits the program cleanly.
+# Reads input file safely.
+# Exits if file does not exist or is empty.
 # ======================================================
 
-def safe_read_lines(input_path: str):
+def safe_read_lines(input_path):
     try:
-        with open(input_path, "r", encoding="UTF-8") as infile:
-            lines = infile.readlines()
+        with open(input_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
     except FileNotFoundError:
         print(f"[MODZ] File not found: {input_path}")
-        sys.exit(1)
-    except Exception as e:
-        print(f"[MODZ] Failed to read file: {e}")
         sys.exit(1)
 
     if not lines:
@@ -41,11 +38,10 @@ def safe_read_lines(input_path: str):
 # ======================================================
 # DELETE CONTAINS
 # ======================================================
-# Removes all lines that contain a given keyword.
-# Returns modified lines only (no file writing).
+# Removes lines containing a keyword
 # ======================================================
 
-def delete_contains(keyword: str, input_path: str):
+def delete_contains(keyword, input_path):
     lines = safe_read_lines(input_path)
     return [line for line in lines if keyword not in line]
 
@@ -53,17 +49,14 @@ def delete_contains(keyword: str, input_path: str):
 # ======================================================
 # DELETE SINGLE LINE
 # ======================================================
-# Deletes one specific line number (1-based index).
-# Validates range and returns modified lines.
+# Deletes a specific line number (1-based)
 # ======================================================
 
-def delete_line(line_number: int, input_path: str):
+def delete_line(line_number, input_path):
     lines = safe_read_lines(input_path)
-    total = len(lines)
 
-    if line_number < 1 or line_number > total:
+    if line_number < 1 or line_number > len(lines):
         print(f"[MODZ] Invalid line number: {line_number}")
-        print(f"[MODZ] File has {total} lines.")
         sys.exit(1)
 
     del lines[line_number - 1]
@@ -73,63 +66,78 @@ def delete_line(line_number: int, input_path: str):
 # ======================================================
 # DELETE RANGE
 # ======================================================
-# Deletes a continuous range of lines (inclusive).
-# Uses slicing for clean and readable logic.
+# Deletes lines from start to end (inclusive)
 # ======================================================
 
-def delete_range(start_line: int, end_line: int, input_path: str):
+def delete_range(start, end, input_path):
     lines = safe_read_lines(input_path)
-    total = len(lines)
 
-    if start_line < 1 or end_line < 1:
-        print("[MODZ] Line numbers must be >= 1.")
+    if start < 1 or end < 1 or start > end:
+        print("[MODZ] Invalid range.")
         sys.exit(1)
 
-    if start_line > end_line:
-        print("[MODZ] start_line cannot be greater than end_line.")
-        sys.exit(1)
-
-    if start_line > total:
-        print(f"[MODZ] File has only {total} lines.")
-        sys.exit(1)
-
-    start_index = start_line - 1
-    end_index = min(end_line, total)
-
-    return lines[:start_index] + lines[end_index:]
+    return lines[:start - 1] + lines[end:]
 
 
 # ======================================================
 # REPLACE TEXT
 # ======================================================
-# Replaces all occurrences of old text with new text.
-# Returns modified lines.
+# Replaces text everywhere
 # ======================================================
 
-def replace_text(old: str, new: str, input_path: str):
+def replace_text(old, new, input_path):
     lines = safe_read_lines(input_path)
     return [line.replace(old, new) for line in lines]
 
 
 # ======================================================
+# HELP TEXT
+# ======================================================
+
+def show_help():
+    print("""
+MODZ — Safe Command-Line Text Editor
+
+Usage:
+  modz <command> [arguments] [--preview]
+
+Commands:
+  delete_contains <keyword> <input> <output>
+  delete_line <line_number> <input> <output>
+  delete_range <start> <end> <input> <output>
+  replace_text <old> <new> <input> <output>
+
+Flags:
+  --preview     Show output only (do not write file)
+
+Examples:
+  modz delete_line 3 notes.txt out.txt --preview
+  modz delete_range 2 5 notes.txt out.txt
+  modz replace_text error warning in.txt out.txt
+""")
+
+
+# ======================================================
 # MAIN COMMAND ROUTER
 # ======================================================
-# Parses CLI arguments.
-# Calls the correct function.
-# Decides preview vs commit.
+# Reads CLI input
+# Calls correct function
+# Decides preview vs commit
 # ======================================================
 
 def main():
-    if len(sys.argv) < 2:
-        print("[MODZ] No command provided.")
-        sys.exit(1)
+    # -------- GLOBAL HELP --------
+    if len(sys.argv) < 2 or sys.argv[1] in ("help", "--help", "-h"):
+        show_help()
+        sys.exit(0)
 
-    command = sys.argv[1]
+    command = argv[1]
     preview = "--preview" in sys.argv
 
+    # -------- COMMAND DISPATCH --------
     if command == "delete_contains":
         if len(sys.argv) < 5:
-            print("Usage: delete_contains <keyword> <input> <output> [--preview]")
+            show_help()
             sys.exit(1)
 
         result = delete_contains(sys.argv[2], sys.argv[3])
@@ -137,7 +145,7 @@ def main():
 
     elif command == "delete_line":
         if len(sys.argv) < 5:
-            print("Usage: delete_line <line_number> <input> <output> [--preview]")
+            show_help()
             sys.exit(1)
 
         result = delete_line(int(sys.argv[2]), sys.argv[3])
@@ -145,15 +153,19 @@ def main():
 
     elif command == "delete_range":
         if len(sys.argv) < 6:
-            print("Usage: delete_range <start> <end> <input> <output> [--preview]")
+            show_help()
             sys.exit(1)
 
-        result = delete_range(int(sys.argv[2]), int(sys.argv[3]), sys.argv[4])
+        result = delete_range(
+            int(sys.argv[2]),
+            int(sys.argv[3]),
+            sys.argv[4]
+        )
         output_path = sys.argv[5]
 
     elif command == "replace_text":
         if len(sys.argv) < 6:
-            print("Usage: replace_text <old> <new> <input> <output> [--preview]")
+            show_help()
             sys.exit(1)
 
         result = replace_text(sys.argv[2], sys.argv[3], sys.argv[4])
@@ -161,16 +173,15 @@ def main():
 
     else:
         print(f"[MODZ] Unknown command: {command}")
+        show_help()
         sys.exit(1)
-        
-# ======================================================
-# PREVIEW OR COMMIT (SAFETY DECISION LAYER)
-# ======================================================
+
+    # -------- PREVIEW OR COMMIT --------
     if preview:
         print("".join(result))
     else:
-        with open(output_path, "w", encoding="UTF-8") as outfile:
-            outfile.writelines(result)
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.writelines(result)
         print("[MODZ] Changes written successfully.")
 
 
