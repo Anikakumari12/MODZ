@@ -12,6 +12,9 @@ Design rules:
 
 import sys
 
+VERSION = "0.1.0"
+
+
 
 # ======================================================
 # SAFE FILE READER
@@ -131,7 +134,11 @@ def main():
         show_help()
         sys.exit(0)
 
-    command = argv[1]
+    if sys.argv[1] in ("--version", "-v"):
+        print(f"MODZ version {VERSION}")
+        sys.exit(0)
+    
+    command = sys.argv[1]
     preview = "--preview" in sys.argv
 
     # -------- COMMAND DISPATCH --------
