@@ -14,6 +14,14 @@ import sys
 
 VERSION = "0.1.0"
 
+# ======================================================
+# EXIT CODES (OS COMMUNICATION)
+# ======================================================
+EXIT_SUCCESS = 0
+EXIT_RUNTIME_ERROR = 1
+EXIT_USAGE_ERROR = 2
+EXIT_FILE_ERROR = 3
+
 
 
 # ======================================================
@@ -29,7 +37,7 @@ def safe_read_lines(input_path):
             lines = f.readlines()
     except FileNotFoundError:
         print(f"[MODZ] File not found: {input_path}")
-        sys.exit(1)
+        sys.exit(EXIT_FILE_ERROR)
 
     if not lines:
         print("[MODZ] Input file is empty.")
@@ -190,6 +198,7 @@ def main():
         with open(output_path, "w", encoding="utf-8") as f:
             f.writelines(result)
         print("[MODZ] Changes written successfully.")
+        sys.exit(EXIT_SUCCESS)
 
 
 # ======================================================
