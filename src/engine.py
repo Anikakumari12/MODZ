@@ -12,16 +12,26 @@ Design rules:
 
 import sys
 
+# ======================================================
+# TOOL IDENTITY
+# ======================================================
+
 VERSION = "0.1.0"
+
+def info(msg):
+    print(msg)
+
+def error(msg):
+    print(msg, file=sys.stderr)
 
 # ======================================================
 # EXIT CODES (OS COMMUNICATION)
 # ======================================================
-EXIT_SUCCESS = 0
-EXIT_RUNTIME_ERROR = 1
-EXIT_USAGE_ERROR = 2
-EXIT_FILE_ERROR = 3
-
+# These communicate *why* the program exited to the OS
+EXIT_SUCCESS = 0        # Everything worked
+EXIT_RUNTIME_ERROR = 1 # Internal failure (reserved for future)
+EXIT_USAGE_ERROR = 2   # User input / command error
+EXIT_FILE_ERROR = 3    # File-related error
 
 
 # ======================================================
@@ -36,12 +46,12 @@ def safe_read_lines(input_path):
         with open(input_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
     except FileNotFoundError:
-        print(f"[MODZ] File not found: {input_path}")
+        error(f"[MODZ] File not found: {input_path}")
         sys.exit(EXIT_FILE_ERROR)
 
     if not lines:
-        print("[MODZ] Input file is empty.")
-        sys.exit(1)
+        error("[MODZ] Input file is empty.")
+        sys.exit(EXIT_FILE_ERROR)
 
     return lines
 
@@ -49,7 +59,7 @@ def safe_read_lines(input_path):
 # ======================================================
 # DELETE CONTAINS
 # ======================================================
-# Removes lines containing a keyword
+# Removes all lines containing a keyword
 # ======================================================
 
 def delete_contains(keyword, input_path):
@@ -67,8 +77,8 @@ def delete_line(line_number, input_path):
     lines = safe_read_lines(input_path)
 
     if line_number < 1 or line_number > len(lines):
-        print(f"[MODZ] Invalid line number: {line_number}")
-        sys.exit(1)
+        error(f"[MODZ] Invalid line number: {line_number}")
+        sys.exit(EXIT_USAGE_ERROR)
 
     del lines[line_number - 1]
     return lines
@@ -84,8 +94,8 @@ def delete_range(start, end, input_path):
     lines = safe_read_lines(input_path)
 
     if start < 1 or end < 1 or start > end:
-        print("[MODZ] Invalid range.")
-        sys.exit(1)
+        error("[MODZ] Invalid range.")
+        sys.exit(EXIT_USAGE_ERROR)
 
     return lines[:start - 1] + lines[end:]
 
@@ -104,8 +114,7 @@ def replace_text(old, new, input_path):
 # ======================================================
 # HELP TEXT
 # ======================================================
-
-def show_help():
+def show_help(stream=sys.stdout):
     print("""
 MODZ — Safe Command-Line Text Editor
 
@@ -125,7 +134,7 @@ Examples:
   modz delete_line 3 notes.txt out.txt --preview
   modz delete_range 2 5 notes.txt out.txt
   modz replace_text error warning in.txt out.txt
-""")
+""", file=stream)
 
 
 # ======================================================
@@ -137,23 +146,24 @@ Examples:
 # ======================================================
 
 def main():
-    # -------- GLOBAL HELP --------
+    # ---------- GLOBAL HELP ----------
     if len(sys.argv) < 2 or sys.argv[1] in ("help", "--help", "-h"):
         show_help()
-        sys.exit(0)
+        sys.exit(EXIT_SUCCESS)
 
+    # ---------- VERSION ----------
     if sys.argv[1] in ("--version", "-v"):
         print(f"MODZ version {VERSION}")
-        sys.exit(0)
-    
+        sys.exit(EXIT_SUCCESS)
+
     command = sys.argv[1]
     preview = "--preview" in sys.argv
 
-    # -------- COMMAND DISPATCH --------
+    # ---------- COMMAND DISPATCH ----------
     if command == "delete_contains":
         if len(sys.argv) < 5:
             show_help()
-            sys.exit(1)
+            sys.exit(EXIT_USAGE_ERROR)
 
         result = delete_contains(sys.argv[2], sys.argv[3])
         output_path = sys.argv[4]
@@ -161,7 +171,7 @@ def main():
     elif command == "delete_line":
         if len(sys.argv) < 5:
             show_help()
-            sys.exit(1)
+            sys.exit(EXIT_USAGE_ERROR)
 
         result = delete_line(int(sys.argv[2]), sys.argv[3])
         output_path = sys.argv[4]
@@ -169,7 +179,7 @@ def main():
     elif command == "delete_range":
         if len(sys.argv) < 6:
             show_help()
-            sys.exit(1)
+            sys.exit(EXIT_USAGE_ERROR)
 
         result = delete_range(
             int(sys.argv[2]),
@@ -181,23 +191,24 @@ def main():
     elif command == "replace_text":
         if len(sys.argv) < 6:
             show_help()
-            sys.exit(1)
+            sys.exit(EXIT_USAGE_ERROR)
 
         result = replace_text(sys.argv[2], sys.argv[3], sys.argv[4])
         output_path = sys.argv[5]
 
     else:
-        print(f"[MODZ] Unknown command: {command}")
-        show_help()
-        sys.exit(1)
+        error(f"[MODZ] Unknown command: {command}")
+        show_help(stream=sys.stderr)
+        sys.exit(EXIT_USAGE_ERROR)
 
-    # -------- PREVIEW OR COMMIT --------
+    # ---------- PREVIEW OR COMMIT ----------
     if preview:
         print("".join(result))
+        sys.exit(EXIT_SUCCESS)
     else:
         with open(output_path, "w", encoding="utf-8") as f:
             f.writelines(result)
-        print("[MODZ] Changes written successfully.")
+        info("[MODZ] Changes written successfully.")
         sys.exit(EXIT_SUCCESS)
 
 
