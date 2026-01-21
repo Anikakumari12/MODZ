@@ -1,36 +1,60 @@
 #!/usr/bin/env python3
 """
-MODZ — Safe Command-Line Text Editor
+MODZ Engine
+-----------
+A safe command-line text manipulation tool.
 
-MODZ is a command-line tool designed to perform safe, predictable
-text transformations without ever modifying the original file.
-
-Core principles:
-- Input files are never mutated
-- All operations are explicit and reversible
-- CLI behavior is deterministic and script-friendly
+Day 3: Engine skeleton
+- No features
+- No file operations
+- Just structure
 """
 
 import sys
 
-# ------------------------------------------------------
-# Tool identity
-# ------------------------------------------------------
+# ======================================================
+# TOOL IDENTITY
+# ======================================================
 
 VERSION = "0.1.0"
 
 
-def main() -> None:
-    """
-    Entry point for the MODZ command-line tool.
+# ======================================================
+# HELP TEXT
+# ======================================================
 
-    At this stage, main() only confirms that MODZ is installed
-    and callable. Command parsing and functionality will be
-    added incrementally.
-    """
-    print(f"MODZ version {VERSION}")
+def show_help():
+    print("""
+MODZ — Safe Command-Line Text Editor
+
+Usage:
+  modz <command> [arguments]
+
+This is the engine skeleton.
+Features will be added incrementally.
+""")
+
+
+# ======================================================
+# MAIN ENTRY POINT
+# ======================================================
+
+def main():
+    # If no arguments are provided, show help
+    if len(sys.argv) < 2:
+        show_help()
+        sys.exit(0)
+
+    # Placeholder for future commands
+    command = sys.argv[1]
+
+    print(f"[MODZ] Command received: {command}")
     sys.exit(0)
 
+
+# ======================================================
+# SAFE EXECUTION GUARD
+# ======================================================
 
 if __name__ == "__main__":
     main()
